@@ -3,14 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <title>PWA - New Service Worker available</title>
+    <link rel="stylesheet" href="./style.css" />
   </head>
 
   <body>
     <img src="./GATX.png" />
     <!-- The notification that will pop up -->
     <div id="notification">
-      A new version of this app is available. Click <a id="reload">here</a> to
-      update.
+      A new version of this app is available. Click
+      <button id="reload">here</button> to update.
     </div>
   </body>
   <script>
@@ -29,5 +30,53 @@
           console.log("ServiceWorker registration failed: ", err);
         });
     }
+  </script>
+  <script>
+    let newWorker;
+
+    // The click event on the notification
+    document.getElementById("reload").addEventListener("click", function () {
+      newWorker.postMessage({ action: "skipWaiting" });
+    });
+
+    if ("serviceWorker" in navigator) {
+      // Register the service worker
+      navigator.serviceWorker.register("/service-worker.js").then((reg) => {
+        console.log("reg", reg);
+
+        reg.addEventListener("updatefound", () => {
+          // An updated service worker has appeared in reg.installing!
+          newWorker = reg.installing;
+          console.log(
+            "reg.installing-------------------------",
+            reg.installing
+          );
+
+          newWorker.addEventListener("statechange", () => {
+            // Has service worker state changed?
+            switch (newWorker.state) {
+              case "installed":
+                // There is a new service worker available, show the notification
+                if (navigator.serviceWorker.controller) {
+                  let notification = document.getElementById("notification");
+                  notification.setAttribute("className", "show");
+                }
+                break;
+            }
+          });
+        });
+      });
+    }
+  </script>
+
+  <script>
+    let refreshing;
+    // The event listener that is fired when the service worker updates
+    // Here we reload the page
+    navigator.serviceWorker.addEventListener("controllerchange", function () {
+      if (refreshing) return;
+      window.location.reload();
+      refreshing = true;
+    });
   </script>
 </html>

@@ -1,0 +1,7 @@
+.hide-notice {
+  visibility: hidden;
+}
+
+.show {
+  visibility: visible;
+}
