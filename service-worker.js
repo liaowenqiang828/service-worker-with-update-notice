@@ -1,13 +1,14 @@
-const cacheName = "sixVersion";
+const cacheName = "17Version";
 
 self.addEventListener("install", (event) => {
+  console.log("install ------------------");
   event.waitUntil(
     caches.open(cacheName).then((cache) => cache.addAll(["./GATX.png"]))
   );
 });
 
 self.addEventListener("message", function (event) {
-  console.log("event", event);
+  console.log("event-------------------------------", event);
   if (event.data.action === "skipWaiting") {
     self.skipWaiting();
   }
